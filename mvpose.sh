@@ -9,6 +9,7 @@ echo ""
 VID_DIR="$1/videos"
 CAM_DIR="$1/cameras"
 POSE_DIR="$1/poses"
+MAIN_DIR="$PWD"
 OPENPOSE_DIR="$PWD/openpose"
 
 if [ ! -d "$VID_DIR" ]; then
@@ -31,6 +32,7 @@ if [ ! -d "$POSE_DIR" ]; then
         POSE2D_OUTPUT="$POSE_DIR/$CAMERA"
         mkdir $POSE2D_OUTPUT
         cd $OPENPOSE_DIR && ./openpose.sh $POSE2D_INPUT $POSE2D_OUTPUT
+        cd $MAIN_DIR
     done
 else
     echo "2D poses already estimated"
@@ -40,19 +42,8 @@ fi
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 echo "docker: $DOCKER_VERSION"
 
-if [[ $DOCKER_VERSION == 19* ]]; then
-  docker run\
-      --gpus all\
-      --privileged\
-      --name='mv3dpose_exec'\
-      --rm\
-      -it\
-      -v "$PWD":/home/user/mv3dpose:ro\
-      -v "$1":/home/user/dataset\
-      jutanke/mv3dpose\
-      /bin/bash exec.sh
-else
-  nvidia-docker run\
+docker run\
+    --gpus all\
     --privileged\
     --name='mv3dpose_exec'\
     --rm\
@@ -61,4 +52,3 @@ else
     -v "$1":/home/user/dataset\
     jutanke/mv3dpose\
     /bin/bash exec.sh
-  fi

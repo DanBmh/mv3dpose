@@ -80,7 +80,10 @@ def tracking(calib_per_frame, poses_per_frame,
             D = np.empty((n, m))
             for tid, track in enumerate(possible_tracks):
                 for pid, pose in enumerate(predictions):
-                    D[tid, pid] = track.distance_to_last(pose)
+                    if all((j is None for j in pose)):
+                        D[tid, pid] = max_distance_between_tracks + 1
+                    else:
+                        D[tid, pid] = track.distance_to_last(pose)
 
             rows, cols = linear_sum_assignment(D)
             D = D * scale_to_mm  # ensure that distances in D are in [mm]
@@ -100,6 +103,8 @@ def tracking(calib_per_frame, poses_per_frame,
             # add all remaining poses as tracks
             for pid, pose in enumerate(predictions):
                 if pid in handled_pids:
+                    continue
+                if all((j is None for j in pose)):
                     continue
                 track = Track(real_t, pose,
                               last_seen_delay=last_seen_delay, z_axis=z_axis)

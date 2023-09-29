@@ -1,4 +1,5 @@
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+# https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html
+FROM nvcr.io/nvidia/pytorch:20.02-py3
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV PATH /opt/miniconda3/bin:$PATH
@@ -129,3 +130,5 @@ COPY exec.sh /exec.sh
 COPY exec_vis.sh /exec_vis.sh
 COPY exec_eval.sh /exec_eval.sh
 COPY exec_test_perms.sh /exec_test_perms.sh
+
+WORKDIR /
