@@ -229,8 +229,12 @@ class Hypothesis:
         veto = False  # if true we cannot join {other} with this
         total_cost = 0
         for person, cam in zip(self.points, self.cams):
-            cost = calculate_cost(cam, person,
-                                  o_cam, o_points)
+            try:
+                cost = calculate_cost(cam, person,
+                                    o_cam, o_points)
+            except AssertionError:
+                cost = self.threshold * 2
+
             total_cost += cost
             if cost > self.threshold and get_believe(person) > 0.5:
                 veto = True
